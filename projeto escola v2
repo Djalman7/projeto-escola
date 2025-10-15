@@ -61,7 +61,6 @@ int main(){
                     }
                     case 2:{
                         printf("Atualizar Aluno\n");
-
                         printf("Digite a matricula\n");
                             int matricula;
                             scanf("%d",&matricula);
