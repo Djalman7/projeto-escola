@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#define TAM_ALUNO 3
+#define TAM_ALUNO 12
 #define CAD_ALUNO_SUCESSO -1
 #define MATRICULA_INVALIDA -2
 #define LISTA_CHEIA -3
@@ -15,10 +15,7 @@ typedef struct aluno{
     int ativo;
     char Nome[50];
     char CPF[15];
-    char [11]; 
-    char troca;//para fazer a Exclusao.
-
-     
+    char dataNascimento[11]; 
 }Aluno;
 
 int menugeral();
@@ -165,11 +162,31 @@ int cadastrarAluno(Aluno lista_aluno[], int qtdAluno){
             printf("Digite a matricula\n");
             int matricula;
             scanf("%d",&matricula);
+            getchar();
                 if(matricula < 0 ){
                 printf("Matricula Inválida\n");
                 return MATRICULA_INVALIDA;
                 }else{
                     lista_aluno[qtdAluno].matricula = matricula;
+
+                    printf("Digite o nome do aluno: ");
+                    fgets(lista_aluno[qtdAluno].Nome, sizeof(lista_aluno[qtdAluno].Nome), stdin);
+                    lista_aluno[qtdAluno].Nome[strcspn(lista_aluno[qtdAluno].Nome, "\n")] = '\0';
+
+                    printf("Digite o CPF: ");
+                    fgets(lista_aluno[qtdAluno].CPF, sizeof(lista_aluno[qtdAluno].CPF), stdin);
+                    lista_aluno[qtdAluno].CPF[strcspn(lista_aluno[qtdAluno].CPF, "\n")] = '\0';
+
+                    printf("Digite a data de nascimento (dd/mm/aaaa): ");
+                    fgets(lista_aluno[qtdAluno].dataNascimento, sizeof(lista_aluno[qtdAluno].dataNascimento), stdin);
+                    lista_aluno[qtdAluno].dataNascimento[strcspn(lista_aluno[qtdAluno].dataNascimento, "\n")] = '\0';
+
+                    printf("Digite o sexo (M/F): ");
+                    scanf(" %c", &lista_aluno[qtdAluno].sexo);
+                    getchar();
+
+
+
                     lista_aluno[qtdAluno].ativo  = 1; 
                     return CAD_ALUNO_SUCESSO;
                 }
@@ -184,17 +201,17 @@ void listarAluno(Aluno lista_aluno[], int qtdAluno){
     if(qtdAluno == 0){
         printf("Lista de alunos vazia!\n");
         }else{for(int i=0; i<qtdAluno; i++){
-            if(lista_aluno[i].ativo == 1)    
-                printf("matricula: %d\n",lista_aluno[i].matricula);
-                /*printf("\n--- Aluno %d ---\n", i + 1);
+            if(lista_aluno[i].ativo == 1){
+                printf("\n--- Aluno %d ---\n", i + 1);
                 printf("Matricula: %d\n", lista_aluno[i].matricula);
-                printf("Nome: %s\n", lista_aluno[i].nome);
-                printf("CPF: %s\n", lista_aluno[i].cpf);
+                printf("Nome: %s\n", lista_aluno[i].Nome);
+                printf("CPF: %s\n", lista_aluno[i].CPF);
                 printf("Data de Nascimento: %s\n", lista_aluno[i].dataNascimento);
-                printf("Sexo: %c\n", lista_aluno[i].sexo);*/
-                }
-    }
+                printf("Sexo: %c\n", lista_aluno[i].sexo);
+            }
+        }
 
+    }
 }
 
 int atualizarAluno(Aluno lista_aluno[], int qtdAluno){
@@ -203,6 +220,7 @@ int atualizarAluno(Aluno lista_aluno[], int qtdAluno){
     printf("Digite a matricula\n");
     int matricula;
     scanf("%d",&matricula);
+    getchar();
     int achou = 0;
     if(matricula < 0 ){
         return MATRICULA_INVALIDA;
@@ -211,11 +229,29 @@ int atualizarAluno(Aluno lista_aluno[], int qtdAluno){
             printf("Digite a nova matricula\n");
             int novamatricula;
             scanf("%d",&novamatricula);
+            getchar();
             if(novamatricula < 0 ){
                 return MATRICULA_INVALIDA;
             }
 
             lista_aluno[i].matricula = novamatricula;
+            
+            printf("Digite o novo nome: ");
+            fgets(lista_aluno[i].Nome, sizeof(lista_aluno[i].Nome), stdin);
+            lista_aluno[i].Nome[strcspn(lista_aluno[i].Nome,"\n")] = '\0';
+
+            printf("Digite o novo CPF: ");
+            fgets(lista_aluno[i].CPF, sizeof(lista_aluno[i].CPF), stdin);
+            lista_aluno[i].CPF[strcspn(lista_aluno[i].CPF,"\n")] = '\0';
+
+            printf("Digite a nova data de nascimento (dd/mm/aaaa): ");
+            fgets(lista_aluno[i].dataNascimento, sizeof(lista_aluno[i].dataNascimento), stdin);
+            lista_aluno[i].dataNascimento[strcspn(lista_aluno[i].dataNascimento,"\n")] = '\0';
+
+            printf("Digite o novo sexo (M/F): ");
+            scanf(" %c", &lista_aluno[i].sexo);
+            getchar();
+
             achou =1;
             break;
                 }
@@ -236,16 +272,17 @@ int excluirAluno(Aluno lista_aluno[], int qtdAluno){
     printf("Digite a matricula\n");
     int matricula;
     scanf("%d",&matricula);
+    getchar();
     int achou = 0;
     if(matricula < 0 ){
         return MATRICULA_INVALIDA;
     }else{for(int i=0; i<TAM_ALUNO; i++){
-        if(matricula == lista_aluno[i].matricula){
+        if(matricula == lista_aluno[i].matricula && lista_aluno[i].ativo == 1){
             lista_aluno[i].ativo = -1;
             for(int j = i; j<qtdAluno -1 ; j++){
-                lista_aluno[j].matricula = lista_aluno[j+1].matricula;
-                lista_aluno[j].troca = lista_aluno[j+1].troca;
-                lista_aluno[j].ativo = lista_aluno[j+1].ativo;
+
+                lista_aluno[j] = lista_aluno[j+1];
+                
                 }
                 achou =1;
                 break;  
