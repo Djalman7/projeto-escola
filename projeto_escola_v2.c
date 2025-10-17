@@ -29,6 +29,8 @@ int atualizarAluno(Aluno lista_aluno[], int qtdAluno);
 int excluirAluno(Aluno lista_aluno[], int qtdAluno);
 int bissexto(int ano);
 int validarData(char *data);
+int validarCPF(char *cpf);
+int validadorSEXO(char sexo);
 
 int main(){
 
@@ -178,10 +180,19 @@ int cadastrarAluno(Aluno lista_aluno[], int qtdAluno){
                     fgets(lista_aluno[qtdAluno].Nome, sizeof(lista_aluno[qtdAluno].Nome), stdin);
                     lista_aluno[qtdAluno].Nome[strcspn(lista_aluno[qtdAluno].Nome, "\n")] = '\0';
 
-                    printf("Digite o CPF: ");
-                    fgets(lista_aluno[qtdAluno].CPF, sizeof(lista_aluno[qtdAluno].CPF), stdin);
-                    lista_aluno[qtdAluno].CPF[strcspn(lista_aluno[qtdAluno].CPF, "\n")] = '\0';
+                    while(1){
+                        printf("Digite o CPF: ");
+                        fgets(lista_aluno[qtdAluno].CPF, sizeof(lista_aluno[qtdAluno].CPF), stdin);
+                        lista_aluno[qtdAluno].CPF[strcspn(lista_aluno[qtdAluno].CPF, "\n")] = '\0';
 
+                        if(validarCPF(lista_aluno[qtdAluno].CPF)){
+                            break;
+                        }else{
+                            printf("CPF inválido! Tente novamente!\n");
+                        }
+
+
+                    }
                     while(1){
 
                         printf("Digite a data de nascimento (dd/mm/aaaa): ");
@@ -196,10 +207,17 @@ int cadastrarAluno(Aluno lista_aluno[], int qtdAluno){
 
 
                     }
-                    printf("Digite o sexo (M/F): ");
-                    scanf(" %c", &lista_aluno[qtdAluno].sexo);
-                    getchar();
 
+                    while(1){
+                        printf("Digite o sexo (M/F): ");
+                        scanf(" %c", &lista_aluno[qtdAluno].sexo);
+                        getchar();
+
+                        if(validadorSEXO(lista_aluno[qtdAluno].sexo)){
+                            break;
+                        }
+                        printf("Sexo inválido! Tente novamente!\n");
+                    }
 
 
                     lista_aluno[qtdAluno].ativo  = 1; 
@@ -254,17 +272,25 @@ int atualizarAluno(Aluno lista_aluno[], int qtdAluno){
             printf("Digite o novo nome: ");
             fgets(lista_aluno[i].Nome, sizeof(lista_aluno[i].Nome), stdin);
             lista_aluno[i].Nome[strcspn(lista_aluno[i].Nome,"\n")] = '\0';
+            
+            while(1){
+                printf("Digite o novo CPF: ");
+                fgets(lista_aluno[i].CPF, sizeof(lista_aluno[i].CPF), stdin);
+                lista_aluno[i].CPF[strcspn(lista_aluno[i].CPF,"\n")] = '\0';
 
-            printf("Digite o novo CPF: ");
-            fgets(lista_aluno[i].CPF, sizeof(lista_aluno[i].CPF), stdin);
-            lista_aluno[i].CPF[strcspn(lista_aluno[i].CPF,"\n")] = '\0';
+                if(validarCPF(lista_aluno[i].CPF)){
+                    break;
+                }else{
+                    printf("CPF inválido! Tente novamente!\n");
+                }
+            }
 
             while(1){
                 printf("Digite a nova data de nascimento (dd/mm/aaaa): ");
-                fgets(lista_aluno[qtdAluno].dataNascimento, sizeof(lista_aluno[qtdAluno].dataNascimento), stdin);
-                lista_aluno[qtdAluno].dataNascimento[strcspn(lista_aluno[qtdAluno].dataNascimento, "\n")] = '\0';
+                fgets(lista_aluno[i].dataNascimento, sizeof(lista_aluno[i].dataNascimento), stdin);
+                lista_aluno[i].dataNascimento[strcspn(lista_aluno[i].dataNascimento, "\n")] = '\0';
                 
-                if(validarData(lista_aluno[qtdAluno].dataNascimento)){
+                if(validarData(lista_aluno[i].dataNascimento)){
                     break;
                 }else{
                     printf("Data inválida ou formato incorreto! Tente novamente.\n");
@@ -272,10 +298,11 @@ int atualizarAluno(Aluno lista_aluno[], int qtdAluno){
             
             }
 
+            while(1){
 
-            printf("Digite o novo sexo (M/F): ");
-            scanf(" %c", &lista_aluno[i].sexo);
-            getchar();
+                printf("Digite o novo sexo (M/F): ");
+                scanf(" %c", &lista_aluno[i].sexo);
+                getchar();
 
             achou =1;
             break;
@@ -325,7 +352,7 @@ int excluirAluno(Aluno lista_aluno[], int qtdAluno){
 
 int bissexto(int ano){
 
-    if((ano%4 == 0 &&ano%100!=0) || (ano%100 == 00)){
+    if((ano%4 == 0 && ano % 100 != 0) || (ano% 400 == 0)){
         return BISSEXTO;
     }
     return NAO_BISSEXTO;
@@ -359,7 +386,7 @@ int validarData(char *data){
     int dia_no_mes;
 
     if(mes == 2){
-        dia_no_mes = bissexto(ano) ? 29:28;
+        dia_no_mes = (bissexto(ano) == BISSEXTO) ? 29:28;
     }else if(mes == 4 || mes == 6 || mes == 9 || mes == 11){
         dia_no_mes = 30;
     }else{
@@ -371,6 +398,78 @@ int validarData(char *data){
     }
 
     return 1;
+
+
+}
+
+int validarCPF(char *cpf){
+
+    char cpf_limpo[12];
+    int j = 0;
+    for(int i = 0; cpf[i]!='\0';i++){
+        if(isdigit(cpf[i])){
+            if( j < 11){
+                cpf_limpo[j] = cpf[i];
+                j++;
+            }
+        }
+    }
+
+    cpf_limpo[j] = '\0';
+    
+    if(j != 11 || strlen(cpf_limpo) != 11){
+        return 0;
+    }
+    int todos_iguais = 1;
+    for(int i = 1; i < 11; i++){
+        if(cpf_limpo[i] != cpf_limpo[0]){
+            todos_iguais = 0;
+            break;
+        }
+    }
+
+    if(todos_iguais){
+        return 0;
+    }
+
+    int soma = 0;
+    for(int i = 0; i < 9; i++){
+        soma += (cpf_limpo[i]- '0') * (10-i); 
+    }
+    
+    int dv1 = (soma *10) %11;
+    if(dv1 == 10){
+        dv1 = 0;
+    }
+
+    if(dv1 != (cpf_limpo[9] - '0')){
+        return 0;
+    }
+
+    soma = 0;
+    for(int i = 0; i < 10; i++){
+        soma +=(cpf_limpo[i] - '0') * (11 - i);
+    }
+
+    int dv2 = (soma * 10) % 11;
+    if(dv2 == 10){
+        dv2 = 0;
+    }
+
+    if(dv2 != (cpf_limpo[10] - '0')){
+        return 0;
+    }
+
+    return 1;
+}
+
+int validadorSEXO(char sexo){
+
+    sexo = toupper(sexo);
+    if(sexo =='M' || sexo == 'F'){
+        return 1;
+    }
+    return 0;
 
 
 }
