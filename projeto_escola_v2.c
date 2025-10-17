@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include<ctype.h>
 #define TAM_ALUNO 12
 #define CAD_ALUNO_SUCESSO -1
 #define MATRICULA_INVALIDA -2
@@ -8,6 +9,8 @@
 #define ATUALIZACAO_ALUNO_SUCESSO -4
 #define MATRICULA_INEXISTENTE -5
 #define EXCLUSAO_ALUNO_SUCESSO -6
+#define BISSEXTO -7
+#define NAO_BISSEXTO -8
 
 typedef struct aluno{
     int matricula;
@@ -24,6 +27,8 @@ int cadastrarAluno(Aluno lista_aluno[], int qtdAluno);
 void listarAluno(Aluno lista_aluno[], int qtdAluno);
 int atualizarAluno(Aluno lista_aluno[], int qtdAluno);
 int excluirAluno(Aluno lista_aluno[], int qtdAluno);
+int bissexto(int ano);
+int validarData(char *data);
 
 int main(){
 
@@ -177,10 +182,20 @@ int cadastrarAluno(Aluno lista_aluno[], int qtdAluno){
                     fgets(lista_aluno[qtdAluno].CPF, sizeof(lista_aluno[qtdAluno].CPF), stdin);
                     lista_aluno[qtdAluno].CPF[strcspn(lista_aluno[qtdAluno].CPF, "\n")] = '\0';
 
-                    printf("Digite a data de nascimento (dd/mm/aaaa): ");
-                    fgets(lista_aluno[qtdAluno].dataNascimento, sizeof(lista_aluno[qtdAluno].dataNascimento), stdin);
-                    lista_aluno[qtdAluno].dataNascimento[strcspn(lista_aluno[qtdAluno].dataNascimento, "\n")] = '\0';
+                    while(1){
 
+                        printf("Digite a data de nascimento (dd/mm/aaaa): ");
+                        fgets(lista_aluno[qtdAluno].dataNascimento, sizeof(lista_aluno[qtdAluno].dataNascimento), stdin);
+                        lista_aluno[qtdAluno].dataNascimento[strcspn(lista_aluno[qtdAluno].dataNascimento, "\n")] = '\0';
+
+                        if(validarData(lista_aluno[qtdAluno].dataNascimento)){
+                            break;
+                        }else{
+                            printf("Data inválda ou formato incorreto tente novamente.\n");
+                        }
+
+
+                    }
                     printf("Digite o sexo (M/F): ");
                     scanf(" %c", &lista_aluno[qtdAluno].sexo);
                     getchar();
@@ -244,9 +259,19 @@ int atualizarAluno(Aluno lista_aluno[], int qtdAluno){
             fgets(lista_aluno[i].CPF, sizeof(lista_aluno[i].CPF), stdin);
             lista_aluno[i].CPF[strcspn(lista_aluno[i].CPF,"\n")] = '\0';
 
-            printf("Digite a nova data de nascimento (dd/mm/aaaa): ");
-            fgets(lista_aluno[i].dataNascimento, sizeof(lista_aluno[i].dataNascimento), stdin);
-            lista_aluno[i].dataNascimento[strcspn(lista_aluno[i].dataNascimento,"\n")] = '\0';
+            while(1){
+                printf("Digite a nova data de nascimento (dd/mm/aaaa): ");
+                fgets(lista_aluno[qtdAluno].dataNascimento, sizeof(lista_aluno[qtdAluno].dataNascimento), stdin);
+                lista_aluno[qtdAluno].dataNascimento[strcspn(lista_aluno[qtdAluno].dataNascimento, "\n")] = '\0';
+                
+                if(validarData(lista_aluno[qtdAluno].dataNascimento)){
+                    break;
+                }else{
+                    printf("Data inválida ou formato incorreto! Tente novamente.\n");
+                }
+            
+            }
+
 
             printf("Digite o novo sexo (M/F): ");
             scanf(" %c", &lista_aluno[i].sexo);
@@ -294,6 +319,58 @@ int excluirAluno(Aluno lista_aluno[], int qtdAluno){
             return MATRICULA_INEXISTENTE;
         }     
     }
+
+
+}
+
+int bissexto(int ano){
+
+    if((ano%4 == 0 &&ano%100!=0) || (ano%100 == 00)){
+        return BISSEXTO;
+    }
+    return NAO_BISSEXTO;
+}
+
+int validarData(char *data){
+    int dia, mes, ano;
+
+    if(strlen(data) != 10){
+        return 0;
+    }
+    for(int i=0; i<10;i++){
+        if(i==2 || i==5){
+            if(data[i] != '/'){
+                return 0;
+            }
+        }else{
+            if(!isdigit(data[i])){
+                return 0;
+            }
+        }
+    }
+    sscanf(data, "%d/%d/%d", &dia, &mes, &ano);
+    if(ano<1900||ano>2025){
+        return 0;
+    }
+    if(mes<1|| mes > 12){
+        return 0;
+    }
+
+    int dia_no_mes;
+
+    if(mes == 2){
+        dia_no_mes = bissexto(ano) ? 29:28;
+    }else if(mes == 4 || mes == 6 || mes == 9 || mes == 11){
+        dia_no_mes = 30;
+    }else{
+        dia_no_mes = 31;
+    }
+
+    if(dia < 1 || dia> dia_no_mes){
+        return 0;
+    }
+
+    return 1;
 
 
 }
